@@ -2,7 +2,7 @@
 
 Also read a collection of things needed to spin up a pulp3 instance.
 
-*Disclamer*
+*Disclaimer*
 
 Very early stage of development, don't use for production!
 
