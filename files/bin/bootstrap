@@ -7,6 +7,7 @@ python36 -m venv pulpvenv
 source pulpvenv/bin/activate
 
 git clone https://github.com/pulp/pulpcore.git
+# checkout pre-breaking rename https://github.com/pulp/pulpcore/commit/01f8cc86b6d0beb14910cfe732c24a0891a4d3d4
 cd pulpcore; git checkout 546a19db850bfb7f8bac820e2c12b1846b98e635; cd -
 pip install -e ./pulpcore
 git clone https://github.com/pulp/pulpcore-plugin.git
@@ -22,6 +23,10 @@ pip install -e ./pulp_rpm
 
 pulp-manager makemigrations rpm
 pulp-manager migrate rpm
+
+# Add the puppet configured settings to the app
+# as the workers don't read the configfile (yet?)
+cat /etc/pulp/settings.py >> /opt/pulp/pulpcore/pulpcore/app/settings.py
 
 systemctl start pulp-server
 systemctl start pulp-resource-manager
