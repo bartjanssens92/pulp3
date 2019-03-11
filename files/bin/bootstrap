@@ -1,0 +1,30 @@
+#!/bin/bash
+set -e
+
+cd /opt/pulp
+
+python36 -m venv pulpvenv
+source pulpvenv/bin/activate
+
+git clone https://github.com/pulp/pulpcore.git
+cd pulpcore; git checkout 546a19db850bfb7f8bac820e2c12b1846b98e635; cd -
+pip install -e ./pulpcore
+git clone https://github.com/pulp/pulpcore-plugin.git
+pip install -e ./pulpcore-plugin/
+pip install psycopg2-binary
+
+pulp-manager migrate --noinput
+pulp-manager reset-admin-password --password admin
+pulp-manager collectstatic --noinput
+
+git clone https://github.com/pulp/pulp_rpm.git
+pip install -e ./pulp_rpm
+
+pulp-manager makemigrations rpm
+pulp-manager migrate rpm
+
+systemctl start pulp-server
+systemctl start pulp-resource-manager
+systemctl start pulp-worker@1
+systemctl start pulp-worker@2
+

@@ -1,0 +1,19 @@
+[Unit]
+Description=Pulp Resource Manager
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+# Set Environment if server.yaml is not in the default /etc/pulp/ directory
+#Environment=PULP_SETTINGS=/etc/pulp/settings.yaml
+Environment="DJANGO_SETTINGS_MODULE=pulpcore.app.settings"
+User=root
+WorkingDirectory=/var/run/pulp-resource-manager/
+RuntimeDirectory=pulp-resource-manager
+ExecStart=/opt/pulp/pulpvenv/bin/rq worker -n resource-manager@%%h\
+          -w 'pulpcore.tasking.worker.PulpWorker'\
+          -c 'pulpcore.rqconfig'\
+          --pid=/var/run/pulp-resource-manager/resource-manager.pid
+
+[Install]
+WantedBy=multi-user.target
