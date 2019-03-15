@@ -32,4 +32,4 @@ systemctl start pulp-server
 systemctl start pulp-resource-manager
 systemctl start pulp-worker@1
 systemctl start pulp-worker@2
-
+systemctl start pulp-rpm-gunicorn

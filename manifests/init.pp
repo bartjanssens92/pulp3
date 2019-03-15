@@ -110,10 +110,16 @@ class profile_pulp3 (
     ensure => directory,
   }
 
-  file { '/usr/bin/pcurl':
-    ensure => present,
-    mode   => '0755',
-    source => "puppet:///modules/${module_name}/bin/pcurl",
+  $helperscripts = [
+    'pcurlg',
+    'pcurlp',
+  ]
+  $helperscripts.each | $script | {
+    file { "/usr/bin/${script}":
+      ensure => present,
+      mode   => '0755',
+      source => "puppet:///modules/${module_name}/bin/${script}",
+    }
   }
 
   file { '/usr/bin/bootstrap_pulp3':
