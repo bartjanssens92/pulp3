@@ -7,8 +7,6 @@ python36 -m venv pulpvenv
 source pulpvenv/bin/activate
 
 git clone https://github.com/pulp/pulpcore.git
-# checkout pre-breaking rename https://github.com/pulp/pulpcore/commit/01f8cc86b6d0beb14910cfe732c24a0891a4d3d4
-cd pulpcore; git checkout 546a19db850bfb7f8bac820e2c12b1846b98e635; cd -
 pip install -e ./pulpcore
 git clone https://github.com/pulp/pulpcore-plugin.git
 pip install -e ./pulpcore-plugin/
