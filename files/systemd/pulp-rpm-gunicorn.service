@@ -5,7 +5,7 @@ Wants=network-online.target
 
 [Service]
 # Set Environment if server.yaml is not in the default /etc/pulp/ directory
-#Environment=PULP_SETTINGS=/etc/pulp/settings.yaml
+Environment=PULP_SETTINGS=/etc/pulp/settings.py
 Environment="DJANGO_SETTINGS_MODULE=pulpcore.app.settings"
 User=root
 WorkingDirectory=/var/run/pulp-rpm-gunicorn/

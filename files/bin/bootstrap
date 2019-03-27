@@ -7,20 +7,20 @@ python36 -m venv pulpvenv
 source pulpvenv/bin/activate
 
 git clone https://github.com/pulp/pulpcore.git
-pip install -e ./pulpcore
+pip install -e ./pulpcore[postgres]
 git clone https://github.com/pulp/pulpcore-plugin.git
 pip install -e ./pulpcore-plugin/
 pip install psycopg2-binary
 
-pulp-manager migrate --noinput
-pulp-manager reset-admin-password --password admin
-pulp-manager collectstatic --noinput
+/opt/pulp/pulpcore/pulpcore/app/manage.py migrate --noinput
+/opt/pulp/pulpcore/pulpcore/app/manage.py reset-admin-password --password admin
+/opt/pulp/pulpcore/pulpcore/app/manage.py collectstatic --noinput
 
 git clone https://github.com/pulp/pulp_rpm.git
 pip install -e ./pulp_rpm
 
-pulp-manager makemigrations rpm
-pulp-manager migrate rpm
+/opt/pulp/pulpcore/pulpcore/app/manage.py makemigrations rpm
+/opt/pulp/pulpcore/pulpcore/app/manage.py migrate rpm
 
 # Add the puppet configured settings to the app
 # as the workers don't read the configfile (yet?)
