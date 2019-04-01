@@ -8,6 +8,7 @@ class profile_pulp3 (
   String               $pulp_db_username = 'pulp',
   String               $pulp_db_password = 'pulp',
   String               $pulp_db_database = 'pulp',
+  String               $pulp_db_host     = 'localhost',
 ) {
 
   # Generate the secret key if not passed

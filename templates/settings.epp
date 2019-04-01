@@ -2,7 +2,8 @@
       String $secret_key,
       String $pulp_db_database,
       String $pulp_db_username,
-      String $pulp_db_password
+      String $pulp_db_password,
+      String $pulp_db_host
 | -%>
 # Managed by Puppet
 
@@ -23,6 +24,7 @@ DATABASES = {
         'NAME': '<%= $pulp_db_database -%>',
         'USER': '<%= $pulp_db_username -%>',
         'PASSWORD': '<%= $pulp_db_password -%>',
+        'HOST': '<%= $pulp_db_host -%>',
         'CONN_MAX_AGE': 0,
     },
 }
