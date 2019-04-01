@@ -103,6 +103,7 @@ class profile_pulp3 (
     'pulp_db_database' => $pulp_db_database,
     'pulp_db_username' => $pulp_db_username,
     'pulp_db_password' => $pulp_db_password,
+    'pulp_db_host'     => $pulp_db_host,
   }
 
   file { '/etc/pulp/settings.py':
