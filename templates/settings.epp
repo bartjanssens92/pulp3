@@ -10,6 +10,7 @@ STATIC_ROOT = '<%= $media_root -%>/static/'
 MEDIA_ROOT = '<%= $media_root -%>/'
 FILE_UPLOAD_TEMP_DIR = '<%= $media_root -%>/tmp/'
 CONTENT_PATH_PREFIX = '/pulp/content/'
+CONTENT_HOST = ''
 
 SECRET_KEY = '<%= $secret_key -%>'
 

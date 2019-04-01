@@ -4,6 +4,7 @@
 class profile_pulp3 (
   Stdlib::Absolutepath $media_root = '/var/lib/pulp',
   Optional[String]     $secret_key = undef,
+  Boolean              $setup_postgres   = true,
   String               $pulp_db_username = 'pulp',
   String               $pulp_db_password = 'pulp',
   String               $pulp_db_database = 'pulp',
@@ -19,33 +20,35 @@ class profile_pulp3 (
   include ::redis
 
   # Database
-  class { '::postgresql::globals':
-    encoding            => 'UTF-8',
-    manage_package_repo => true,
-    version             => '10',
-  }
+  if $setup_postgres {
+    class { '::postgresql::globals':
+      encoding            => 'UTF-8',
+      manage_package_repo => true,
+      version             => '10',
+    }
 
-  -> class { '::postgresql::server':
-    ip_mask_allow_all_users => '0.0.0.0/32',
-    listen_addresses        => 'localhost',
+    -> class { '::postgresql::server':
+      ip_mask_allow_all_users => '0.0.0.0/32',
+      listen_addresses        => 'localhost',
+    }
+
+    postgresql::server::db { $pulp_db_database:
+      user     => $pulp_db_username,
+      password => $pulp_db_password,
+      grant    => 'all',
+      before   => Exec['bootstrap::pulp3'],
+    }
+
+    postgresql::server::pg_hba_rule { $pulp_db_database:
+      type        => 'local',
+      database    => $pulp_db_database,
+      user        => $pulp_db_username,
+      auth_method => 'md5',
+      before      => Exec['bootstrap::pulp3'],
+    }
   }
 
   class { '::postgresql::client': }
-
-  postgresql::server::db { $pulp_db_database:
-    user     => $pulp_db_username,
-    password => $pulp_db_password,
-    grant    => 'all',
-    before   => Exec['bootstrap::pulp3'],
-  }
-
-  postgresql::server::pg_hba_rule { $pulp_db_database:
-    type        => 'local',
-    database    => $pulp_db_database,
-    user        => $pulp_db_username,
-    auth_method => 'md5',
-    before      => Exec['bootstrap::pulp3'],
-  }
 
   # packages for building atm
   $packages = [
@@ -132,6 +135,7 @@ class profile_pulp3 (
     path    => $::path,
     command => '/usr/bin/bootstrap_pulp3',
     creates => '/opt/pulp/pulpvenv/bin/activate',
+    timeout => 0,
     require => [
       Package[$packages],
       File['/opt/pulp'],
