@@ -1,0 +1,6 @@
+#!/bin/bash
+
+ARGS=$1
+name=$2
+
+curl -s "http://admin:admin@localhost:8000/pulp/api/v3/${ARGS}/?name=${name}" | python -mjson.tool

@@ -118,6 +118,7 @@ class profile_pulp3 (
   $helperscripts = [
     'pcurlg',
     'pcurlp',
+    'pcurlf',
   ]
   $helperscripts.each | $script | {
     file { "/usr/bin/${script}":
