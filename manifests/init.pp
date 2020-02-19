@@ -37,7 +37,6 @@ class profile_pulp3 (
       user     => $pulp_db_username,
       password => $pulp_db_password,
       grant    => 'all',
-      before   => Exec['bootstrap::pulp3'],
     }
 
     postgresql::server::pg_hba_rule { $pulp_db_database:
@@ -45,7 +44,6 @@ class profile_pulp3 (
       database    => $pulp_db_database,
       user        => $pulp_db_username,
       auth_method => 'md5',
-      before      => Exec['bootstrap::pulp3'],
     }
   }
 
@@ -53,6 +51,7 @@ class profile_pulp3 (
 
   # packages for building atm
   $packages = [
+    'postgresql-devel-9.2.24-2.el7_7.x86_64',
     'python36',
     'git',
     'tig',
@@ -72,6 +71,7 @@ class profile_pulp3 (
     'xz-devel',
     'zchunk-devel',
     'zlib-devel',
+    'python3',
   ]
 
   package { $packages:
@@ -80,16 +80,16 @@ class profile_pulp3 (
 
   # systemd files for dev
   $systemd_files = [
-    'pulp-resource-manager.service',
+    'pulpcore-resource-manager.service',
+    'pulpcore-api.service',
+    'pulpcore-content.service',
+    'pulpcore-worker@.service',
     'pulp-rpm-gunicorn.service',
-    'pulp-server.service',
-    'pulp-worker@.service',
   ]
 
   $systemd_files.each | $systemd_file | {
     systemd::unit_file { $systemd_file:
       source => "puppet:///modules/${module_name}/systemd/${systemd_file}",
-      before => Exec['bootstrap::pulp3'],
     }
   }
 
@@ -128,24 +128,24 @@ class profile_pulp3 (
     }
   }
 
-  file { '/usr/bin/bootstrap_pulp3':
-    ensure => present,
-    mode   => '0755',
-    source => "puppet:///modules/${module_name}/bin/bootstrap",
-  }
+  #file { '/usr/bin/bootstrap_pulp3':
+  #  ensure => present,
+  #  mode   => '0755',
+  #  source => "puppet:///modules/${module_name}/bin/bootstrap",
+  #}
 
-  exec { 'bootstrap::pulp3':
-    path    => $::path,
-    command => '/usr/bin/bootstrap_pulp3',
-    creates => '/opt/pulp/pulpvenv/bin/activate',
-    timeout => 0,
-    require => [
-      Package[$packages],
-      File['/opt/pulp'],
-      File['/etc/pulp/settings.py'],
-      File['/usr/bin/bootstrap_pulp3'],
-      Service['redis'],
-    ],
-  }
+  #exec { 'bootstrap::pulp3':
+  #  path    => $::path,
+  #  command => '/usr/bin/bootstrap_pulp3',
+  #  creates => '/opt/pulp/pulpvenv/bin/activate',
+  #  timeout => 0,
+  #  require => [
+  #    Package[$packages],
+  #    File['/opt/pulp'],
+  #    File['/etc/pulp/settings.py'],
+  #    File['/usr/bin/bootstrap_pulp3'],
+  #    Service['redis'],
+  #  ],
+  #}
 
 }

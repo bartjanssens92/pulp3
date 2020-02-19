@@ -1,0 +1,34 @@
+[Unit]
+Description=Pulp WSGI Server
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Environment="DJANGO_SETTINGS_MODULE=pulpcore.app.settings"
+Environment="PULP_SETTINGS=/etc/pulp/settings.py"
+Environment="PATH=/opt/pulp/venv/bin:$PATH"
+User=root
+PIDFile=/run/pulpcore-api.pid
+RuntimeDirectory=pulpcore-api
+ExecStart=/opt/pulp/venv/bin/gunicorn pulpcore.app.wsgi:application \
+          --bind '127.0.0.1:24817' \
+          --access-logfile -
+ProtectSystem=full
+PrivateTmp=yes
+PrivateDevices=yes
+
+
+# This provides reconnect support for PostgreSQL and Redis. Without reconnect support, if either
+# is not available at startup or becomes disconnected, this process will die and not respawn.
+Restart=always
+RestartSec=3
+
+# This directive is set to an absolute path in other Pulp units. Using an
+# absolute path is an abuse of the directive, as it should be a relative path,
+# not an absolute path. PIDFile is now used to ensure that PID files are laid
+# out in a standard way. If this directive had any other effects, it is better
+# to use the correct directive than to uncomment this.
+# WorkingDirectory=/var/run/pulpcore-api/
+
+[Install]
+WantedBy=multi-user.target
