@@ -12,10 +12,10 @@ class profile_pulp3::rpm () {
     ensure => present,
   }
 
-  file { "${pulp_dir}/venv/pyvenv.cfg":
-    ensure  => present,
-    content => 'home = /bin
-include-system-site-packages = true
-version = 3.6.8',
-  }
+  #  file { "${pulp_dir}/venv/pyvenv.cfg":
+  #    ensure  => present,
+  #    content => 'home = /bin
+  #include-system-site-packages = true
+  #version = 3.6.8',
+  #  }
 }
