@@ -9,6 +9,8 @@ class profile_pulp3 (
   String               $pulp_db_password = 'pulp',
   String               $pulp_db_database = 'pulp',
   String               $pulp_db_host     = 'localhost',
+  String               $hostname         = $::fqdn,
+  String               $proto            = 'http',
 ) {
 
   # Generate the secret key if not passed
@@ -19,6 +21,7 @@ class profile_pulp3 (
   }
 
   include ::redis
+  include ::profile_pulp3::rpm
 
   # Database
   if $setup_postgres {
@@ -71,7 +74,6 @@ class profile_pulp3 (
     'xz-devel',
     'zchunk-devel',
     'zlib-devel',
-    'python3',
   ]
 
   package { $packages:
@@ -97,18 +99,26 @@ class profile_pulp3 (
     ensure => directory,
   }
 
-  $settings_hash = {
-    'media_root'       => $media_root,
-    'secret_key'       => $_secret_key,
+  $db_settings = {
     'pulp_db_database' => $pulp_db_database,
     'pulp_db_username' => $pulp_db_username,
     'pulp_db_password' => $pulp_db_password,
     'pulp_db_host'     => $pulp_db_host,
   }
+  $content_settings = {
+    'content_path_prefix' => '/pulp/content/',
+    'content_origin'      => "${proto}://${hostname}",
+  }
+  $media_settings = {
+    'media_root' => $media_root,
+  }
+  $settings_hash = {
+    'secret_key' => $_secret_key,
+  }
 
   file { '/etc/pulp/settings.py':
     ensure  => present,
-    content => epp('profile_pulp3/settings', $settings_hash)
+    content => epp('profile_pulp3/settings', $db_settings + $content_settings + $media_settings + $settings_hash )
   }
 
   file { '/opt/pulp':
@@ -128,11 +138,11 @@ class profile_pulp3 (
     }
   }
 
-  #file { '/usr/bin/bootstrap_pulp3':
-  #  ensure => present,
-  #  mode   => '0755',
-  #  source => "puppet:///modules/${module_name}/bin/bootstrap",
-  #}
+  file { '/usr/bin/bootstrap_pulp3':
+    ensure => present,
+    mode   => '0755',
+    source => "puppet:///modules/${module_name}/bin/bootstrap",
+  }
 
   #exec { 'bootstrap::pulp3':
   #  path    => $::path,
@@ -147,5 +157,4 @@ class profile_pulp3 (
   #    Service['redis'],
   #  ],
   #}
-
 }
