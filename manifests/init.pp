@@ -54,7 +54,7 @@ class profile_pulp3 (
 
   # packages for building atm
   $packages = [
-    'postgresql-devel-9.2.24-2.el7_7.x86_64',
+    'postgresql-devel',
     'python36',
     'git',
     'tig',
