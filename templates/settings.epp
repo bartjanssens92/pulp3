@@ -3,16 +3,17 @@
       String $pulp_db_database,
       String $pulp_db_username,
       String $pulp_db_password,
-      String $pulp_db_host
+      String $pulp_db_host,
+      String $content_path_prefix,
+      String $content_origin
 | -%>
 # Managed by Puppet
 
 STATIC_ROOT = '<%= $media_root -%>/static/'
 MEDIA_ROOT = '<%= $media_root -%>/'
 FILE_UPLOAD_TEMP_DIR = '<%= $media_root -%>/tmp/'
-CONTENT_PATH_PREFIX = '/pulp/content/'
-CONTENT_HOST = ''
-CONTENT_ORIGIN = 'http://pulp3.vagrant-mgmt'
+CONTENT_PATH_PREFIX = '<%= $content_path_prefix -%>'
+CONTENT_ORIGIN = '<%= $content_origin -%>'
 
 SECRET_KEY = '<%= $secret_key -%>'
 
