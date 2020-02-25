@@ -1,0 +1,8 @@
+<%- | String $username,
+      String $password
+| -%>
+#!/bin/bash
+
+ARGS=$@
+
+curl -s "http://<%= $username -%>:<%= $password -%>@localhost:8000/pulp/api/v3/${ARGS}/" | python -mjson.tool

@@ -1,6 +1,0 @@
-#!/bin/bash
-
-ENDPOINT=$1
-DATA=$2
-
-curl -s -L -X POST -H "Content-Type: application/json" "http://admin:admin@localhost:8000/pulp/api/v3/${ENDPOINT}/" -d "${DATA}" | python -mjson.tool

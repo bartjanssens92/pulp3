@@ -2,15 +2,18 @@
 #
 #
 class profile_pulp3 (
-  Stdlib::Absolutepath $media_root = '/var/lib/pulp',
-  Optional[String]     $secret_key = undef,
+  String               $admin_password,
+  String               $admin_username   = 'admin',
   Boolean              $setup_postgres   = true,
+  Boolean              $setup_redis      = true,
   String               $pulp_db_username = 'pulp',
   String               $pulp_db_password = 'pulp',
   String               $pulp_db_database = 'pulp',
-  String               $pulp_db_host     = 'localhost',
-  String               $hostname         = $::fqdn,
-  String               $proto            = 'http',
+  Stdlib::Fqdn         $pulp_db_host     = $::fqdn,
+  Stdlib::Absolutepath $media_root       = '/var/lib/pulp',
+  Optional[String]     $secret_key       = undef,
+  Stdlib::Fqdn         $hostname         = $::fqdn,
+  Enum['http','https'] $proto            = 'http',
 ) {
 
   # Generate the secret key if not passed
@@ -20,8 +23,12 @@ class profile_pulp3 (
     $_secret_key = $secret_key
   }
 
-  include ::redis
+  if $setup_redis {
+    include ::redis
+  }
+
   include ::profile_pulp3::rpm
+  include ::profile_pulp3::helperscripts
 
   # Database
   if $setup_postgres {
@@ -118,30 +125,11 @@ class profile_pulp3 (
 
   file { '/etc/pulp/settings.py':
     ensure  => present,
-    content => epp('profile_pulp3/settings', $db_settings + $content_settings + $media_settings + $settings_hash )
+    content => epp("${module_name}/settings", $db_settings + $content_settings + $media_settings + $settings_hash )
   }
 
   file { '/opt/pulp':
     ensure => directory,
-  }
-
-  $helperscripts = [
-    'pcurlg',
-    'pcurlp',
-    'pcurlf',
-  ]
-  $helperscripts.each | $script | {
-    file { "/usr/bin/${script}":
-      ensure => present,
-      mode   => '0755',
-      source => "puppet:///modules/${module_name}/bin/${script}",
-    }
-  }
-
-  file { '/usr/bin/bootstrap_pulp3':
-    ensure => present,
-    mode   => '0755',
-    source => "puppet:///modules/${module_name}/bin/bootstrap",
   }
 
   #exec { 'bootstrap::pulp3':
