@@ -1,3 +1,9 @@
+<%- | String  $pulp_settings,
+      String  $pulp_venv_dir,
+      String  $pulp_user,
+      String  $content_address,
+      Integer $content_port
+| -%>
 [Unit]
 Description=Pulp Content App
 After=network-online.target
@@ -5,13 +11,13 @@ Wants=network-online.target
 
 [Service]
 Environment="DJANGO_SETTINGS_MODULE=pulpcore.app.settings"
-Environment="PULP_SETTINGS=/etc/pulp/settings.py"
-Environment="PATH=/opt/pulp/venv/bin:$PATH"
-User=root
+Environment="PULP_SETTINGS=<%= $pulp_settings -%>"
+Environment="PATH=<%= $pulp_venv_dir -%>/bin:$PATH"
+User=<%= $pulp_user %>
 WorkingDirectory=/var/run/pulpcore-content/
 RuntimeDirectory=pulpcore-content
-ExecStart=/opt/pulp/venv/bin/gunicorn pulpcore.content:server \
-          --bind '127.0.0.1:24816' \
+ExecStart=<%= $pulp_venv_dir -%>/bin/gunicorn pulpcore.content:server \
+          --bind '<%= $content_address -%>:<%= $content_port -%>' \
           --worker-class 'aiohttp.GunicornWebWorker' \
           -w 2 \
           --access-logfile -

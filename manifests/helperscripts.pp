@@ -2,8 +2,10 @@
 #
 #
 class profile_pulp3::helperscripts (
-  String $username = $::profile_pulp3::admin_username,
-  String $password = $::profile_pulp3::admin_password,
+  String  $username    = $::profile_pulp3::admin_username,
+  String  $password    = $::profile_pulp3::admin_password,
+  String  $api_address = $::profile_pulp3::api_address,
+  Integer $api_port    = $::profile_pulp3::api_port,
 ) {
 
   $helperscripts = [
@@ -13,8 +15,10 @@ class profile_pulp3::helperscripts (
   ]
 
   $_credentials = {
-    'username' => $username,
-    'password' => $password,
+    'username'    => $username,
+    'password'    => $password,
+    'api_address' => $api_address,
+    'api_port'    => $api_port,
   }
 
   $helperscripts.each | $script | {

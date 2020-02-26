@@ -1,16 +1,20 @@
+<%- | String $pulp_settings,
+      String $pulp_venv_dir,
+      String $pulp_user
+| -%>
 [Unit]
 Description=Pulp Resource Manager
 After=network-online.target
 Wants=network-online.target
 
 [Service]
-Environment="PULP_SETTINGS=/etc/pulp/settings.py"
 Environment="DJANGO_SETTINGS_MODULE=pulpcore.app.settings"
-Environment="PATH=/opt/pulp/venv/bin:$PATH"
-User=root
+Environment="PULP_SETTINGS=<%= $pulp_settings -%>"
+Environment="PATH=<%= $pulp_venv_dir -%>/bin:$PATH"
+User=<%= $pulp_user %>
 WorkingDirectory=/var/run/pulpcore-resource-manager/
 RuntimeDirectory=pulpcore-resource-manager
-ExecStart=/opt/pulp/venv/bin/rq worker \
+ExecStart=<%= $pulp_venv_dir -%>/bin/rq worker \
           -w pulpcore.tasking.worker.PulpWorker -n resource-manager \
           --pid=/var/run/pulpcore-resource-manager/resource-manager.pid \
           -c 'pulpcore.rqconfig' \

@@ -2,26 +2,35 @@
 #
 #
 class profile_pulp3 (
-  String               $admin_password,
-  String               $admin_username   = 'admin',
-  Boolean              $setup_postgres   = true,
-  Boolean              $setup_redis      = true,
-  String               $pulp_db_username = 'pulp',
-  String               $pulp_db_password = 'pulp',
-  String               $pulp_db_database = 'pulp',
-  Stdlib::Fqdn         $pulp_db_host     = $::fqdn,
-  Stdlib::Absolutepath $media_root       = '/var/lib/pulp',
-  Optional[String]     $secret_key       = undef,
-  Stdlib::Fqdn         $hostname         = $::fqdn,
-  Enum['http','https'] $proto            = 'http',
+  String                                    $admin_password,
+
+  Boolean                                   $setup_postgres   =  true,
+  Boolean                                   $setup_redis      =  true,
+
+  String                                    $admin_username   =  'admin',
+  String                                    $pulp_db_username =  'pulp',
+  String                                    $pulp_db_password =  'pulp',
+  String                                    $pulp_db_database =  'pulp',
+  Variant[Stdlib::Fqdn, Stdlib::Ip_address] $pulp_db_host     =  $::fqdn,
+
+  Stdlib::Absolutepath                      $pulp_settings    =  '/etc/pulp/settings.py',
+  Stdlib::Absolutepath                      $pulp_venv_dir    =  '/opt/pulp/venv',
+  String                                    $pulp_user        =  'root',
+  String                                    $pulp_group       =  'root',
+  Variant[Stdlib::Fqdn, Stdlib::Ip_address] $api_address      =  '127.0.0.1',
+  Integer                                   $api_port         =  24817,
+  Variant[Stdlib::Fqdn, Stdlib::Ip_address] $content_address  =  '127.0.0.1',
+  Integer                                   $content_port     =  24816,
+
+  Stdlib::Absolutepath                      $media_root       =  '/var/lib/pulp',
+  Optional[String]                          $secret_key       =  undef,
+  Stdlib::Fqdn                              $hostname         =  $::fqdn,
+  Enum['http','https']                      $proto            =  'http',
+  Enum['server','manager','worker','aio']   $setup            = 'aio',
 ) {
 
   # Generate the secret key if not passed
-  if ! $secret_key {
-    $_secret_key = fqdn_rand_string('50','abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)')
-  } else {
-    $_secret_key = $secret_key
-  }
+  $_secret_key = pick( $secret_key, fqdn_rand_string('50','abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'))
 
   if $setup_redis {
     include ::redis
@@ -30,31 +39,28 @@ class profile_pulp3 (
   include ::profile_pulp3::rpm
   include ::profile_pulp3::helperscripts
 
+  case $setup {
+    'server': {
+      include ::profile_pulp3::component::api
+      include ::profile_pulp3::component::content
+    }
+    'manager': {
+      include ::profile_pulp3::component::resource_manager
+    }
+    'worker': {
+      include ::profile_pulp3::component::worker
+    }
+    default: {
+      include ::profile_pulp3::component::api
+      include ::profile_pulp3::component::content
+      include ::profile_pulp3::component::resource_manager
+      include ::profile_pulp3::component::worker
+    }
+  }
+
   # Database
   if $setup_postgres {
-    class { '::postgresql::globals':
-      encoding            => 'UTF-8',
-      manage_package_repo => true,
-      version             => '10',
-    }
-
-    -> class { '::postgresql::server':
-      ip_mask_allow_all_users => '0.0.0.0/32',
-      listen_addresses        => 'localhost',
-    }
-
-    postgresql::server::db { $pulp_db_database:
-      user     => $pulp_db_username,
-      password => $pulp_db_password,
-      grant    => 'all',
-    }
-
-    postgresql::server::pg_hba_rule { $pulp_db_database:
-      type        => 'local',
-      database    => $pulp_db_database,
-      user        => $pulp_db_username,
-      auth_method => 'md5',
-    }
+    include ::profile_pulp3::postgres
   }
 
   class { '::postgresql::client': }
@@ -85,21 +91,6 @@ class profile_pulp3 (
 
   package { $packages:
     ensure => present,
-  }
-
-  # systemd files for dev
-  $systemd_files = [
-    'pulpcore-resource-manager.service',
-    'pulpcore-api.service',
-    'pulpcore-content.service',
-    'pulpcore-worker@.service',
-    'pulp-rpm-gunicorn.service',
-  ]
-
-  $systemd_files.each | $systemd_file | {
-    systemd::unit_file { $systemd_file:
-      source => "puppet:///modules/${module_name}/systemd/${systemd_file}",
-    }
   }
 
   file { '/etc/pulp':

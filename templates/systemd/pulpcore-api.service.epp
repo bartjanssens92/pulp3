@@ -1,3 +1,9 @@
+<%- | String  $pulp_settings,
+      String  $pulp_venv_dir,
+      String  $pulp_user,
+      String  $api_address,
+      Integer $api_port
+| -%>
 [Unit]
 Description=Pulp WSGI Server
 After=network-online.target
@@ -5,13 +11,13 @@ Wants=network-online.target
 
 [Service]
 Environment="DJANGO_SETTINGS_MODULE=pulpcore.app.settings"
-Environment="PULP_SETTINGS=/etc/pulp/settings.py"
-Environment="PATH=/opt/pulp/venv/bin:$PATH"
-User=root
+Environment="PULP_SETTINGS=<%= $pulp_settings -%>"
+Environment="PATH=<%= $pulp_venv_dir -%>/bin:$PATH"
+User=<%= $pulp_user %>
 PIDFile=/run/pulpcore-api.pid
 RuntimeDirectory=pulpcore-api
-ExecStart=/opt/pulp/venv/bin/gunicorn pulpcore.app.wsgi:application \
-          --bind '127.0.0.1:24817' \
+ExecStart=<%= $pulp_venv_dir -%>/bin/gunicorn pulpcore.app.wsgi:application \
+          --bind '<%= $api_address -%>:<%= $api_port -%>' \
           --access-logfile -
 ProtectSystem=full
 PrivateTmp=yes

@@ -1,3 +1,8 @@
+<%- | String $pulp_settings,
+      String $pulp_venv_dir,
+      String $pulp_user,
+      String $pulp_group
+| -%>
 [Unit]
 Description=Pulp RQ Worker
 After=network-online.target
@@ -7,13 +12,13 @@ Wants=network-online.target
 EnvironmentFile=-/etc/default/pulp-workers
 EnvironmentFile=-/etc/default/pulp-workers-%i
 Environment="DJANGO_SETTINGS_MODULE=pulpcore.app.settings"
-Environment="PULP_SETTINGS=/etc/pulp/settings.py"
-Environment="PATH=/opt/pulp/venv/bin:$PATH"
-User=root
-Group=root
+Environment="PULP_SETTINGS=<%= $pulp_settings -%>"
+Environment="PATH=<%= $pulp_venv_dir -%>/bin:$PATH"
+User=<%= $pulp_user %>
+Group=<%= $pulp_group %>
 WorkingDirectory=/var/run/pulpcore-worker-%i/
 RuntimeDirectory=pulpcore-worker-%i
-ExecStart=/opt/pulp/venv/bin/rq worker \
+ExecStart=<%= $pulp_venv_dir -%>/bin/rq worker \
           -w pulpcore.tasking.worker.PulpWorker \
           --pid=/var/run/pulpcore-worker-%i/reserved-resource-worker-%i.pid \
           -c 'pulpcore.rqconfig' \
