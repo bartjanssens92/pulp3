@@ -27,17 +27,24 @@ class profile_pulp3 (
   Stdlib::Fqdn                              $hostname         =  $::fqdn,
   Enum['http','https']                      $proto            =  'http',
   Enum['server','manager','worker','aio']   $setup            = 'aio',
+
+  Array                                     $plugins          = ['pulp-rpm'],
 ) {
 
   # Generate the secret key if not passed
   $_secret_key = pick( $secret_key, fqdn_rand_string('50','abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'))
 
+  include ::profile_pulp3::helperscripts
+
   if $setup_redis {
     include ::redis
   }
 
-  include ::profile_pulp3::rpm
-  include ::profile_pulp3::helperscripts
+  $plugins.each | $plugin | {
+    $_plugin = regsubst( $plugin, '-', '_' )
+    include "::profile_pulp3::plugin::${_plugin}"
+  }
+
 
   case $setup {
     'server': {
@@ -65,6 +72,12 @@ class profile_pulp3 (
 
   class { '::postgresql::client': }
 
+  include ::profile_pulp3::install::pypi
+
+  #file { '/opt/pulp':
+  #  ensure => directory,
+  #}
+
   # packages for building atm
   $packages = [
     'postgresql-devel',
@@ -89,9 +102,9 @@ class profile_pulp3 (
     'zlib-devel',
   ]
 
-  package { $packages:
-    ensure => present,
-  }
+  #package { $packages:
+  #  ensure => present,
+  #}
 
   file { '/etc/pulp':
     ensure => directory,
@@ -117,10 +130,6 @@ class profile_pulp3 (
   file { '/etc/pulp/settings.py':
     ensure  => present,
     content => epp("${module_name}/settings", $db_settings + $content_settings + $media_settings + $settings_hash )
-  }
-
-  file { '/opt/pulp':
-    ensure => directory,
   }
 
   #exec { 'bootstrap::pulp3':

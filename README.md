@@ -11,4 +11,5 @@ All-in-one:
 include ::profile_pulp3
 
 This class will setup a postgres and redis servers for pulp to use.
-It will also use the bootstrap script to setup a pulp instance with the rpm plugin.
+
+Now managing the installation of pulpcore with the python puppet module.
