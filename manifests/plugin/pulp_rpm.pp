@@ -1,7 +1,10 @@
 #
 #
 #
-class profile_pulp3::plugin::pulp_rpm () {
+class profile_pulp3::plugin::pulp_rpm (
+  String $version = 'present',
+  String $pip     = 'pulp-rpm',
+) {
 
   $dependencies = [
     'libmodulemd2-devel',
@@ -10,6 +13,11 @@ class profile_pulp3::plugin::pulp_rpm () {
 
   package { $dependencies:
     ensure => present,
+  }
+
+  python::pip { "${pip}::${version}":
+    ensure  => $version,
+    pkgname => $pip,
   }
 
   #  file { "${pulp_dir}/venv/pyvenv.cfg":
