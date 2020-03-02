@@ -2,28 +2,36 @@
 #
 #
 class profile_pulp3::plugin::pulp_rpm (
-  String $version = 'present',
-  String $pip     = 'pulp-rpm',
+  String               $pip          = 'pulp-rpm',
+  String               $version      = '3.1.0',
+  Stdlib::Absolutepath $venv_path    = $::profile_pulp3::pulp_venv_dir,
+  Stdlib::Absolutepath $settings     = $::profile_pulp3::pulp_settings,
+  Array                $dependencies = [],
 ) {
-
-  $dependencies = [
-    'libmodulemd2-devel',
-    'python36-gobject',
-  ]
 
   package { $dependencies:
     ensure => present,
   }
 
-  python::pip { "${pip}::${version}":
+  python::pip { "${venv_path}::${pip}::${version}":
     ensure  => $version,
     pkgname => $pip,
+    require => Package[$dependencies],
   }
 
-  #  file { "${pulp_dir}/venv/pyvenv.cfg":
-  #    ensure  => present,
-  #    content => 'home = /bin
-  #include-system-site-packages = true
-  #version = 3.6.8',
-  #  }
+  Exec {
+    path        => "${venv_path}/bin:${::path}",
+    environment => [
+      'DJANGO_SETTINGS_MODULE=pulpcore.app.settings',
+      "PULP_SETTINGS=${settings}",
+      "LD_LIBRARY_PATH=${pulp_venv_dir}/lib64",
+    ],
+  }
+
+  exec { 'pulp-rpm_migration':
+    command     => 'django-admin migrate rpm',
+    tag         => 'pulp3_migration',
+    refreshonly => true,
+    subscribe   => Python::Pip["${venv_path}::${pip}::${version}"],
+  }
 }

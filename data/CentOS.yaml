@@ -17,3 +17,7 @@ profile_pulp3::install::pypi::dependencies:
   - 'zchunk-devel'
   - 'zlib-devel'
 
+
+profile_pulp3::plugin::pulp_rpm::dependencies:
+  - 'libmodulemd2-devel'
+  - 'python36-gobject'

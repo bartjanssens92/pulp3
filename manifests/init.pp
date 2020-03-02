@@ -58,6 +58,7 @@ class profile_pulp3 (
       include "::profile_pulp3::install::${install_method}"
       include ::profile_pulp3::component::api
       include ::profile_pulp3::component::content
+      include ::profile_pulp3::plugin
     }
     'manager': {
       class {"::profile_pulp3::install::${install_method}":
@@ -77,11 +78,8 @@ class profile_pulp3 (
       include ::profile_pulp3::component::content
       include ::profile_pulp3::component::resource_manager
       include ::profile_pulp3::component::worker
+      include ::profile_pulp3::plugin
     }
   }
 
-  $plugins.each | $plugin | {
-    $_plugin = regsubst( $plugin, '-', '_' )
-    include "::profile_pulp3::plugin::${_plugin}"
-  }
 }
