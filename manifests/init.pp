@@ -84,19 +84,4 @@ class profile_pulp3 (
     $_plugin = regsubst( $plugin, '-', '_' )
     include "::profile_pulp3::plugin::${_plugin}"
   }
-
-
-  #exec { 'bootstrap::pulp3':
-  #  path    => $::path,
-  #  command => '/usr/bin/bootstrap_pulp3',
-  #  creates => '/opt/pulp/pulpvenv/bin/activate',
-  #  timeout => 0,
-  #  require => [
-  #    Package[$packages],
-  #    File['/opt/pulp'],
-  #    File['/etc/pulp/settings.py'],
-  #    File['/usr/bin/bootstrap_pulp3'],
-  #    Service['redis'],
-  #  ],
-  #}
 }
