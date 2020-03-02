@@ -2,10 +2,11 @@
 #
 #
 class profile_pulp3::component::worker (
-  String $pulp_settings = $::profile_pulp3::pulp_settings,
-  String $pulp_venv_dir = $::profile_pulp3::pulp_venv_dir,
-  String $pulp_user     = $::profile_pulp3::pulp_user,
-  String $pulp_group    = $::profile_pulp3::pulp_group,
+  String  $pulp_settings = $::profile_pulp3::pulp_settings,
+  String  $pulp_venv_dir = $::profile_pulp3::pulp_venv_dir,
+  String  $pulp_user     = $::profile_pulp3::pulp_user,
+  String  $pulp_group    = $::profile_pulp3::pulp_group,
+  Integer $pulp_workers  = $::profile_pulp3::pulp_workers,
 ) {
 
   $_config = {
@@ -17,5 +18,14 @@ class profile_pulp3::component::worker (
 
   systemd::unit_file { 'pulpcore-worker@.service':
     content => epp("${module_name}/systemd/pulpcore-worker@.service", $_config)
+  }
+
+  $_workers = profile_pulp3::generate_workers($pulp_workers)
+  $_workers.each | $i | {
+    service { "pulpcore-worker@${i}":
+      ensure    => running,
+      tag       => 'pulpcore_service',
+      subscribe => Systemd::Unit_file['pulpcore-worker@.service'],
+    }
   }
 }

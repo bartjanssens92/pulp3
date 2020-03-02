@@ -16,4 +16,10 @@ class profile_pulp3::component::resource_manager (
   systemd::unit_file { 'pulpcore-resource-manager.service':
     content => epp("${module_name}/systemd/pulpcore-resource-manager.service", $_config)
   }
+
+  service { 'pulpcore-resource-manager':
+    ensure    => running,
+    tag       => 'pulpcore_service',
+    subscribe => Systemd::Unit_file['pulpcore-resource-manager.service'],
+  }
 }

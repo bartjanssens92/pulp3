@@ -20,4 +20,10 @@ class profile_pulp3::component::api (
   systemd::unit_file { 'pulpcore-api.service':
     content => epp("${module_name}/systemd/pulpcore-api.service", $_config)
   }
+
+  service { 'pulpcore-api':
+    ensure    => running,
+    tag       => 'pulpcore_service',
+    subscribe => Systemd::Unit_file['pulpcore-api.service'],
+  }
 }

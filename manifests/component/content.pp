@@ -20,4 +20,10 @@ class profile_pulp3::component::content (
   systemd::unit_file { 'pulpcore-content.service':
     content => epp("${module_name}/systemd/pulpcore-content.service", $_config)
   }
+
+  service { 'pulpcore-content':
+    ensure    => running,
+    tag       => 'pulpcore_service',
+    subscribe => Systemd::Unit_file['pulpcore-content.service'],
+  }
 }
