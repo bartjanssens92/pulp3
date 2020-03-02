@@ -35,14 +35,14 @@ class profile_pulp3::install::pypi (
   }
 
   python::virtualenv { $venv_path:
-    ensure       => present,
-    version      => $python_version,
-    distribute   => false,
-    systempkgs   => true,
-    virtualenv   => 'virtualenv-3',
-    owner        => $user,
-    group        => $group,
-    require      => [
+    ensure     => present,
+    version    => $python_version,
+    distribute => false,
+    systempkgs => true,
+    virtualenv => 'virtualenv-3',
+    owner      => $user,
+    group      => $group,
+    require    => [
       Exec[$_base_path],
     ],
   }
@@ -63,7 +63,7 @@ class profile_pulp3::install::pypi (
     environment => [
       'DJANGO_SETTINGS_MODULE=pulpcore.app.settings',
       "PULP_SETTINGS=${settings}",
-      "LD_LIBRARY_PATH=${pulp_venv_dir}/lib64",
+      "LD_LIBRARY_PATH=${venv_path}/lib64",
     ],
   }
 
@@ -80,7 +80,7 @@ class profile_pulp3::install::pypi (
     }
 
     exec { 'collectstatic':
-      command => 'django-admin collectstatic --noinput',
+      command     => 'django-admin collectstatic --noinput',
       tag         => 'pulp3_migration',
       refreshonly => true,
       subscribe   => Python::Pip["${venv_path}::${pip}::${version}"],

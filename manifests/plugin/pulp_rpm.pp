@@ -24,7 +24,7 @@ class profile_pulp3::plugin::pulp_rpm (
     environment => [
       'DJANGO_SETTINGS_MODULE=pulpcore.app.settings',
       "PULP_SETTINGS=${settings}",
-      "LD_LIBRARY_PATH=${pulp_venv_dir}/lib64",
+      "LD_LIBRARY_PATH=${venv_path}/lib64",
     ],
   }
 
