@@ -21,6 +21,11 @@ class profile_pulp3::helperscripts (
     'api_port'    => $api_port,
   }
 
+  # Make sure helperscripts dependencies are installed
+  package {'python3':
+    ensure => 'latest',
+  }
+
   $helperscripts.each | $script | {
     file { "/usr/bin/${script}":
       ensure  => present,
@@ -28,4 +33,5 @@ class profile_pulp3::helperscripts (
       content => epp("${module_name}/bin/${script}", $_credentials),
     }
   }
+
 }

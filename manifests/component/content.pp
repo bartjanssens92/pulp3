@@ -4,7 +4,7 @@
 class profile_pulp3::component::content (
   String  $pulp_settings = $::profile_pulp3::pulp_settings,
   String  $pulp_user     = $::profile_pulp3::pulp_user,
-  String  $pulp_venv_dir = $::profile_pulp3::pulp_venv_dir,
+  String  $pulp_group    = $::profile_pulp3::pulp_group,
   String  $address       = $::profile_pulp3::content_address,
   Integer $port          = $::profile_pulp3::content_port,
 ) {
@@ -12,7 +12,7 @@ class profile_pulp3::component::content (
   $_config = {
     'pulp_settings'   => $pulp_settings,
     'pulp_user'       => $pulp_user,
-    'pulp_venv_dir'   => $pulp_venv_dir,
+    'pulp_group'    => $pulp_group,
     'content_address' => $address,
     'content_port'    => $port,
   }
@@ -23,6 +23,7 @@ class profile_pulp3::component::content (
 
   service { 'pulpcore-content':
     ensure    => running,
+    enable    => true,
     tag       => 'pulpcore_service',
     subscribe => Systemd::Unit_file['pulpcore-content.service'],
   }

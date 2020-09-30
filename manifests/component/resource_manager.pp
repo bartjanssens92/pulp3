@@ -4,13 +4,13 @@
 class profile_pulp3::component::resource_manager (
   String $pulp_settings = $::profile_pulp3::pulp_settings,
   String $pulp_user     = $::profile_pulp3::pulp_user,
-  String $pulp_venv_dir = $::profile_pulp3::pulp_venv_dir,
+  String $pulp_group    = $::profile_pulp3::pulp_group,
 ) {
 
   $_config = {
     'pulp_settings' => $pulp_settings,
     'pulp_user'     => $pulp_user,
-    'pulp_venv_dir' => $pulp_venv_dir,
+    'pulp_group'    => $pulp_group,
   }
 
   systemd::unit_file { 'pulpcore-resource-manager.service':
@@ -19,6 +19,7 @@ class profile_pulp3::component::resource_manager (
 
   service { 'pulpcore-resource-manager':
     ensure    => running,
+    enable    => true,
     tag       => 'pulpcore_service',
     subscribe => Systemd::Unit_file['pulpcore-resource-manager.service'],
   }
