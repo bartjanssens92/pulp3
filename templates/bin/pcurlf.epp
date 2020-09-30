@@ -8,4 +8,4 @@
 ARGS=$1
 name=$2
 
-curl -s "http://<%= $username -%>:<%= $password -%>@<%= $api_address -%>:<%= $api_port -%>/pulp/api/v3/${ARGS}/?name=${name}" | python3 -mjson.tool
+curl -s "http://<%= $username -%>:<%= $password -%>@<%= $api_address -%>:<%= $api_port -%>/pulp/api/v3/${ARGS}/?name=${name}" | json_pp

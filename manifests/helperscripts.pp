@@ -21,9 +21,8 @@ class profile_pulp3::helperscripts (
     'api_port'    => $api_port,
   }
 
-  # Make sure helperscripts dependencies are installed
-  package {'python3':
-    ensure => 'latest',
+  package { 'perl-JSON-PP':
+    ensure => present,
   }
 
   $helperscripts.each | $script | {

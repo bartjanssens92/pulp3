@@ -7,4 +7,4 @@
 
 ARGS=$@
 
-curl -s "http://<%= $username -%>:<%= $password -%>@<%= $api_address -%>:<%= $api_port -%>/pulp/api/v3/${ARGS}/" | python3 -mjson.tool
+curl -s "http://<%= $username -%>:<%= $password -%>@<%= $api_address -%>:<%= $api_port -%>/pulp/api/v3/${ARGS}/" | json_pp

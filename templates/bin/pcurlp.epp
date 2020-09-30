@@ -8,4 +8,4 @@
 ENDPOINT=$1
 DATA=$2
 
-curl -s -L -X POST -H "Content-Type: application/json" "http://<%= $username -%>:<%= $password -%>@<%= $api_address -%>:<%= $api_port -%>/pulp/api/v3/${ENDPOINT}/" -d "${DATA}" | python3 -mjson.tool
+curl -s -L -X POST -H "Content-Type: application/json" "http://<%= $username -%>:<%= $password -%>@<%= $api_address -%>:<%= $api_port -%>/pulp/api/v3/${ENDPOINT}/" -d "${DATA}" | json_pp

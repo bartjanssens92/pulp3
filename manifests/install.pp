@@ -5,7 +5,7 @@ class profile_pulp3::install (
   Boolean              $manage_repo      = $::profile_pulp3::manage_repo,
   String               $pulpcore_package = $::profile_pulp3::pulpcore_package,
   String               $version          = $::profile_pulp3::version,
-  String               $admin_password   = profile_pulp3::admin_password,
+  String               $admin_password   = $::profile_pulp3::admin_password,
 ) {
 
   if $manage_repo {
