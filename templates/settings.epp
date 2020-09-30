@@ -1,32 +1,45 @@
-<%- | String $media_root,
-      String $secret_key,
-      String $pulp_db_database,
-      String $pulp_db_username,
-      String $pulp_db_password,
-      String $pulp_db_host,
-      String $content_path_prefix,
-      String $content_origin
+<%- | String  $media_root,
+      String  $secret_key,
+      String  $redis_host,
+      Integer $redis_port,
+      Integer $redis_db,
+      String  $pulp_db_database,
+      String  $pulp_db_username,
+      String  $pulp_db_password,
+      String  $pulp_db_host,
+      Integer $pulp_db_port,
+      String  $content_path_prefix,
+      String  $content_origin
 | -%>
 # Managed by Puppet
 
 STATIC_ROOT = '<%= $media_root -%>/static/'
 MEDIA_ROOT = '<%= $media_root -%>/'
 FILE_UPLOAD_TEMP_DIR = '<%= $media_root -%>/tmp/'
-CONTENT_PATH_PREFIX = '<%= $content_path_prefix -%>'
+WORKING_DIRECTORY = '<%= $media_root -%>/tmp/'
+
+CONTENT_HOST = '<%= $facts['networking']['fqdn'] -%>'
 CONTENT_ORIGIN = '<%= $content_origin -%>'
+CONTENT_PATH_PREFIX = '<%= $content_path_prefix -%>'
 
 SECRET_KEY = '<%= $secret_key -%>'
 
+<%# Redis configuration -%>
+REDIS_HOST = '<%= $redis_host -%>'
+REDIS_PORT = '<%= $redis_port -%>'
+REDIS_DB = '<%= $redis_db -%>'
+
 #SETTINGS_MODULE_FOR_DYNACONF = "/etc/pulp/settings.py"
 
-# https://docs.djangoproject.com/en/1.11/ref/settings/#databases
+<%# https://docs.djangoproject.com/en/1.11/ref/settings/#databases -%>
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': 'django.db.backends.postgresql',
         'NAME': '<%= $pulp_db_database -%>',
         'USER': '<%= $pulp_db_username -%>',
         'PASSWORD': '<%= $pulp_db_password -%>',
         'HOST': '<%= $pulp_db_host -%>',
+        'PORT': '<%= $pulp_db_port -%>',
         'CONN_MAX_AGE': 0,
     },
 }

@@ -3,7 +3,6 @@
 #
 class profile_pulp3::component::worker (
   String  $pulp_settings = $::profile_pulp3::pulp_settings,
-  String  $pulp_venv_dir = $::profile_pulp3::pulp_venv_dir,
   String  $pulp_user     = $::profile_pulp3::pulp_user,
   String  $pulp_group    = $::profile_pulp3::pulp_group,
   Integer $pulp_workers  = $::profile_pulp3::pulp_workers,
@@ -13,7 +12,6 @@ class profile_pulp3::component::worker (
     'pulp_settings' => $pulp_settings,
     'pulp_user'     => $pulp_user,
     'pulp_group'    => $pulp_group,
-    'pulp_venv_dir' => $pulp_venv_dir,
   }
 
   systemd::unit_file { 'pulpcore-worker@.service':
@@ -24,6 +22,7 @@ class profile_pulp3::component::worker (
   $_workers.each | $i | {
     service { "pulpcore-worker@${i}":
       ensure    => running,
+      enable    => true,
       tag       => 'pulpcore_service',
       subscribe => Systemd::Unit_file['pulpcore-worker@.service'],
     }

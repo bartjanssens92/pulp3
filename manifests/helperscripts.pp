@@ -21,6 +21,10 @@ class profile_pulp3::helperscripts (
     'api_port'    => $api_port,
   }
 
+  package { 'perl-JSON-PP':
+    ensure => present,
+  }
+
   $helperscripts.each | $script | {
     file { "/usr/bin/${script}":
       ensure  => present,
@@ -28,4 +32,5 @@ class profile_pulp3::helperscripts (
       content => epp("${module_name}/bin/${script}", $_credentials),
     }
   }
+
 }

@@ -1,0 +1,8 @@
+<%- | String $api_address,
+      String $admin_username,
+      String $admin_password,
+| -%>
+# Managed by Puppet
+machine <%= $api_address %> 
+login <%= $admin_username %> 
+password <%= $admin_password %> 

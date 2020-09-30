@@ -1,6 +1,6 @@
 <%- | String  $pulp_settings,
-      String  $pulp_venv_dir,
       String  $pulp_user,
+      String  $pulp_group,
       String  $content_address,
       Integer $content_port
 | -%>
@@ -12,11 +12,11 @@ Wants=network-online.target
 [Service]
 Environment="DJANGO_SETTINGS_MODULE=pulpcore.app.settings"
 Environment="PULP_SETTINGS=<%= $pulp_settings -%>"
-Environment="PATH=<%= $pulp_venv_dir -%>/bin:$PATH"
 User=<%= $pulp_user %>
+Group=<%= $pulp_group %>
 WorkingDirectory=/var/run/pulpcore-content/
 RuntimeDirectory=pulpcore-content
-ExecStart=<%= $pulp_venv_dir -%>/bin/gunicorn pulpcore.content:server \
+ExecStart=/bin/gunicorn pulpcore.content:server \
           --bind '<%= $content_address -%>:<%= $content_port -%>' \
           --worker-class 'aiohttp.GunicornWebWorker' \
           -w 2 \
